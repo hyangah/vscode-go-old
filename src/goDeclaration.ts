@@ -226,7 +226,9 @@ function definitionLocation_gogetdoc(
 	const env = getToolsEnvVars();
 	let p: cp.ChildProcess;
 	if (token) {
-		token.onCancellationRequested(() => killTree(p.pid));
+		token.onCancellationRequested(() => {
+			killTree(p.pid);
+		});
 	}
 
 	return new Promise<GoDefinitionInformation>((resolve, reject) => {
@@ -247,6 +249,11 @@ function definitionLocation_gogetdoc(
 				}
 				if (stderr && stderr.startsWith('flag provided but not defined: -tags')) {
 					p = null;
+					return definitionLocation_gogetdoc(input, token, false).then(resolve, reject);
+				}
+				if (stderr && stderr.includes('failed to cache compiled Go files')) {
+					p = null;
+					console.log(`gogetdoc failed (https://golang.org/issues/29667): ${stderr}`);
 					return definitionLocation_gogetdoc(input, token, false).then(resolve, reject);
 				}
 				if (err) {
