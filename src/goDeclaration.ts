@@ -226,7 +226,10 @@ function definitionLocation_gogetdoc(
 	const env = getToolsEnvVars();
 	let p: cp.ChildProcess;
 	if (token) {
-		token.onCancellationRequested(() => killTree(p.pid));
+		token.onCancellationRequested(() => {
+			console.log('cancelling gogetdoc process '+p.pid);
+			killTree(p.pid);
+		});
 	}
 
 	return new Promise<GoDefinitionInformation>((resolve, reject) => {
@@ -241,6 +244,7 @@ function definitionLocation_gogetdoc(
 		const gogetdocFlags =
 			buildTags && useTags ? [...gogetdocFlagsWithoutTags, '-tags', buildTags] : gogetdocFlagsWithoutTags;
 		p = cp.execFile(gogetdoc, gogetdocFlags, { env, cwd: input.cwd }, (err, stdout, stderr) => {
+			console.log(`gogetdoc ${gogetdocFlags}: ERR:${err} STDERR:${stderr} STDOUT:${stdout}`);
 			try {
 				if (err && (<any>err).code === 'ENOENT') {
 					return reject(missingToolMsg + 'gogetdoc');
