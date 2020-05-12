@@ -2,32 +2,32 @@ import * as assert from 'assert';
 import cp = require('child_process');
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import * as vscode from 'vscode';
-import { updateGoPathGoRootFromConfig } from '../../src/goInstallTools';
-import { extensionId } from '../../src/telemetry';
-import { getCurrentGoPath } from '../../src/util';
-import { languageClient } from '../../src/goLanguageServer';
 import sinon = require('sinon');
+import * as vscode from 'vscode';
+import { languageClient } from '../../src/goLanguageServer';
+import { extensionId } from '../../src/telemetry';
 
 // FakeOutputChannel is a fake output channel used to buffer
 // the output of the tested language client in an in-memory
 // string array until cleared.
 class FakeOutputChannel implements vscode.OutputChannel {
-	name = 'FakeOutputChannel';
-	append = (v: string) => this.enqueue(v);
-	appendLine = (v: string) => this.enqueue(v);
-	show = () => { };
-	clear = () => { this.buf = []; };
-	hide = () => { };
-	dispose = () => { };
+	public name = 'FakeOutputChannel';
+	public show = sinon.fake(); // no-empty
+	public hide = sinon.fake(); // no-empty
+	public dispose = sinon.fake();  // no-empty
 
 	private buf = [] as string[];
-	enqueue = (v: string) => {
+
+	public append = (v: string) => this.enqueue(v);
+	public appendLine = (v: string) => this.enqueue(v);
+	public clear = () => { this.buf = []; };
+	public toString = () => {
+		return this.buf.join('\n');
+	}
+
+	private enqueue = (v: string) => {
 		if (this.buf.length > 1024) { this.buf.shift(); }
 		this.buf.push(v.trim());
-	}
-	toString = () => {
-		return this.buf.join('\n');
 	}
 }
 
@@ -147,7 +147,7 @@ suite('Go Extension Tests With Gopls', function () {
 	this.afterEach(function () {
 		// Note: this shouldn't use () => {...}. arrow functions don't have 'this'.
 		// I don't know why but this.currentTest.state does not have the expected value when used with teardown.
-		env.flushTrace(this.currentTest.state == 'failed');
+		env.flushTrace(this.currentTest.state === 'failed');
 	});
 
 	test('HoverProvider', async () => {

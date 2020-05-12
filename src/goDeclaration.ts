@@ -227,7 +227,7 @@ function definitionLocation_gogetdoc(
 	let p: cp.ChildProcess;
 	if (token) {
 		token.onCancellationRequested(() => {
-			console.log('cancelling gogetdoc process '+p.pid);
+			console.log('cancelling gogetdoc process ' + p.pid);
 			killTree(p.pid);
 		});
 	}
