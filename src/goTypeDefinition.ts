@@ -130,7 +130,7 @@ export class GoTypeDefinitionProvider implements vscode.TypeDefinitionProvider {
 			if (process.pid) {
 				process.stdin.end(getFileArchive(document));
 			}
-			token.onCancellationRequested(() => killTree(process.pid));
+			token.onCancellationRequested(() => killTree(process));
 		});
 	}
 }

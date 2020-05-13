@@ -116,7 +116,7 @@ function callGoSymbols(args: string[], token: vscode.CancellationToken): Promise
 	let p: cp.ChildProcess;
 
 	if (token) {
-		token.onCancellationRequested(() => killTree(p.pid));
+		token.onCancellationRequested(() => killTree(p));
 	}
 
 	return new Promise((resolve, reject) => {

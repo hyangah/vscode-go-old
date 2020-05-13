@@ -49,7 +49,7 @@ export class GoRenameProvider implements vscode.RenameProvider {
 
 			let p: cp.ChildProcess;
 			if (token) {
-				token.onCancellationRequested(() => killTree(p.pid));
+				token.onCancellationRequested(() => killTree(p));
 			}
 
 			p = cp.execFile(gorename, gorenameArgs, { env }, (err, stdout, stderr) => {

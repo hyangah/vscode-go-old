@@ -330,7 +330,7 @@ export async function isVendorSupported(): Promise<boolean> {
 		case 1:
 			vendorSupport =
 				goVersion.sv.minor > 6 ||
-				((goVersion.sv.minor === 5 || goVersion.sv.minor === 6) && process.env['GO15VENDOREXPERIMENT'] === '1')
+					((goVersion.sv.minor === 5 || goVersion.sv.minor === 6) && process.env['GO15VENDOREXPERIMENT'] === '1')
 					? true
 					: false;
 			break;
@@ -674,11 +674,7 @@ export function runTool(
 
 	let p: cp.ChildProcess;
 	if (token) {
-		token.onCancellationRequested(() => {
-			if (p) {
-				killTree(p.pid);
-			}
-		});
+		token.onCancellationRequested(() => killTree(p));
 	}
 	cwd = fixDriveCasingInWindows(cwd);
 	return new Promise((resolve, reject) => {
@@ -853,12 +849,14 @@ export function getWorkspaceFolderPath(fileUri?: vscode.Uri): string {
 	}
 }
 
-export const killTree = (processId: number): void => {
-	kill(processId, (err) => {
-		if (err) {
-			console.log('Error killing process tree: ' + err);
-		}
-	});
+export const killTree = (p: cp.ChildProcess): void => {
+	if (p && p.pid && !p.killed && p.exitCode == null) {
+		kill(p.pid, (err) => {
+			if (err) {
+				console.log('Error killing process tree: ' + err);
+			}
+		});
+	}
 };
 
 export function killProcess(p: cp.ChildProcess) {
@@ -1015,9 +1013,7 @@ export function runGodoc(
 			});
 
 			if (token) {
-				token.onCancellationRequested(() => {
-					killTree(p.pid);
-				});
+				token.onCancellationRequested(() => killTree(p));
 			}
 		});
 	});

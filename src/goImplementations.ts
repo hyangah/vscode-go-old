@@ -130,10 +130,10 @@ export class GoImplementationProvider implements vscode.ImplementationProvider {
 
 						return resolve(results);
 					});
-					token.onCancellationRequested(() => killTree(guruProcess.pid));
+					token.onCancellationRequested(() => killTree(guruProcess));
 				}
 			);
-			token.onCancellationRequested(() => killTree(listProcess.pid));
+			token.onCancellationRequested(() => killTree(listProcess));
 		});
 	}
 }
