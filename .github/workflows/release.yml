@@ -35,15 +35,15 @@ jobs:
       - name: get release version
         id: release_version
         run: |
-          TAGGED_VERSION=${GITHUB_REF/refs\/tags\/v/}
-          WRITTEN_VERSION=$(`cat package.json | jq '.version' -r`)
+          TAGGED_VERSION="${GITHUB_REF/refs\/tags\/v/}""
+          WRITTEN_VERSION="$(cat package.json | jq '.version' -r)"
 
-          echo ::set-env name=EXT_VERSION::${TAGGED_VERSION}
+          echo ::set-env name=EXT_VERSION::"${TAGGED_VERSION}"
 
           if [[ ${TAGGED_VERSION} == *"-"* ]]; then
             echo ::set-env name=EXT_ISPREVIEW::1
           else
-            if [[ ${TAGGED_VERSION} != ${WRITTEN_VERSION} ]]; then
+            if [[ "${TAGGED_VERSION}" != "${WRITTEN_VERSION}" ]]; then
               echo "Release Tag and Version in package.json do not match (${TAGGED_VERSION} vs ${WRITTEN_VERSION})"
               exit(1)
             fi
