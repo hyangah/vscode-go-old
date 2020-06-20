@@ -14,12 +14,12 @@ jobs:
     steps:
       - name: checkout code
         uses: action/checkout@v2
-        run: npm ci
-
+       
       - name: stamp version
         run: |
           cat package.json | jq --args VER "${{ github.ref }}" '.version=$VER' > /tmp/package.json 
           cp /tmp/package.json ./package.json
+          npm ci
           npm run vscode:prepublish
         
       - name: package
