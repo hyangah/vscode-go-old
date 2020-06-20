@@ -20,8 +20,6 @@ name: Release (golang.go)
 #       - Packaging and release.
 on:
   push:
-    branches:
-      - release
     tags:
       - v*  
 
